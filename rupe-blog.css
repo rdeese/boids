@@ -1,0 +1,28 @@
+.img-responsive {
+  margin: 0 auto;
+}
+
+p {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+article li a {
+  text-decoration: underline;
+}
+
+h1, h2, h3 {
+  margin-top: 35px;
+  margin-bottom: 15px;
+}
+
+h4 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+figure {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
