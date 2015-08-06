@@ -85,9 +85,12 @@ h5 {
         </section>
         <h5>The Boid-World</h5>
         <div id="boidsim" width=750 height=950>
-          <canvas id="boidland" width="750" height="550">
-              This text is displayed if your browser does not support HTML5 Canvas.
-          </canvas>
+          <div id="boidland" width=750 height=550>
+            <canvas id="boidfood" style="z-index: 1; position:absolute; left:0px; top:0px;" width="750" height="550"></canvas>
+            <canvas id="boidsboidsboids" style="z-index: 2; position:absolute; left:0px; top:0px;" width="750" height="550">
+                This text is displayed if your browser does not support HTML5 Canvas.
+            </canvas>
+          </div>
           <div id="boidcharts">
             <div id="genomeChartDiv">
               <h5>Current Genome</h5>
@@ -116,4 +119,4 @@ h5 {
           </div>
         </div>
         <script type='text/javascript' src='chart.js'></script>
-        <script type='text/javascript' src='boids-nearbirth.js'></script>
+        <script type='text/javascript' src='boids-food.js'></script>
