@@ -254,7 +254,7 @@ Flock.prototype = {
     var boidsToBeKilled = {};
     for (var i = 0; i < this.boidList.length; i++) {
       var boid = this.boidList[i];
-      var resultObj = boid.update(i, this.boidList, this.food.eat(boid.position, this.timestep));
+      var resultObj = this.updateBoid(boid, i, this.food.eat(boid.position, this.timestep));
       var theseBoidsToBeKilled = resultObj.collidingBoids;
       if (theseBoidsToBeKilled.length > 0) {
         for (var j = 0; j < theseBoidsToBeKilled.length; j++) {
@@ -349,6 +349,89 @@ Flock.prototype = {
     }
   },
 
+  updateBoid: function (boid, thisBoidsIndex, didEat) {
+    var boidsCollidingWithThisBoid = [];
+    var neighborCount = 0;
+    boid.nearestNeighbor = null;
+    boid.nearestNeighborDist = Infinity;
+    var neighborContributedAcceleration = new Vector(0,0);
+
+    for (var i = 0; i < this.boidList.length; i++) {
+      var otherBoid = this.boidList[i];
+      var distanceFromOtherBoid = boid.position.distanceFrom(otherBoid.position);
+      if (distanceFromOtherBoid < neighborDistance && boid != otherBoid) {
+        // apply genomic flocking forces
+        var accelerationFromThisNeighbor = boid.calculateAccelerationFromNeighbor(otherBoid);
+        neighborContributedAcceleration.x += accelerationFromThisNeighbor.x;
+        neighborContributedAcceleration.y += accelerationFromThisNeighbor.y;
+
+        if (distanceFromOtherBoid < collisionDistance) {
+          boidsCollidingWithThisBoid.push(i);
+        } else if (distanceFromOtherBoid < boid.nearestNeighborDist) {
+          boid.nearestNeighbor = otherBoid;
+          boid.nearestNeighborDist = distanceFromOtherBoid;
+        }
+
+        neighborCount++;
+      } else {
+        otherBoid.position.unwrap(this.boundsVec, neighborDistance);
+        distanceFromOtherBoid = boid.position.distanceFrom(otherBoid.position);
+        if (distanceFromOtherBoid < neighborDistance && boid != otherBoid) {
+          // apply genomic flocking forces
+          var accelerationFromThisNeighbor = boid.calculateAccelerationFromNeighbor(otherBoid);
+          neighborContributedAcceleration.x += accelerationFromThisNeighbor.x;
+          neighborContributedAcceleration.y += accelerationFromThisNeighbor.y;
+
+          if (distanceFromOtherBoid < collisionDistance) {
+            boidsCollidingWithThisBoid.push(i);
+          } else if (distanceFromOtherBoid < boid.nearestNeighborDist) {
+            boid.nearestNeighbor = otherBoid;
+            boid.nearestNeighborDist = distanceFromOtherBoid;
+          }
+
+         neighborCount++;
+        }
+        otherBoid.position.wrap(this.boundsVec);
+      }
+    }
+
+    // apply loneliness death possibility
+    // if (Math.random() < lonelyDeathProbability && neighborCount == 0) { boidsCollidingWithThisBoid.push(thisBoidsIndex); }
+
+    // apply new (incentivizes big groups) loneliness death possibility
+    //if (Math.random()+Math.random()*neighborCount < lonelyDeathProbability) {
+    //  boidsCollidingWithThisBoid.push(thisBoidsIndex);
+    //}
+
+    // try to eat, die if ye fail.
+    if (!didEat) {
+      boidsCollidingWithThisBoid.push(thisBoidsIndex);
+    }
+
+    if (neighborCount > 0) {
+      boid.acceleration.x += neighborContributedAcceleration.x / neighborCount;
+      boid.acceleration.y += neighborContributedAcceleration.y / neighborCount;
+    }
+
+    // apply genomic acceleration and velocity based changes
+    boid.calculateAccelerationFromSelf();
+
+    // do physics
+    boid.iterateKinematics(this.boundsVec);
+
+    // get older
+    boid.age++;
+
+    // return indices to be deleted if this boid and another boid have collided.
+    if (boidsCollidingWithThisBoid.length > 0) {
+      boidsCollidingWithThisBoid.push(thisBoidsIndex);
+    }
+    return {
+             collidingBoids: boidsCollidingWithThisBoid,
+             neighborCount: neighborCount
+           };
+  },
+
   flockFinishedCallback: function () {
     charts.saveLocalToGlobal();
     charts.resetLocalCharts();
@@ -406,98 +489,16 @@ Boid.prototype = {
     this.acceleration.y += this.velocity.y*this.genome[1];
   },
 
-  iterateKinematics: function() {
+  iterateKinematics: function(boundsVec) {
     this.normalizeAcceleration();
     this.velocity.x += this.acceleration.x;
     this.velocity.y += this.acceleration.y;
     this.normalizeVelocity();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
-    this.position.wrap(this.boundsVec);
+    this.position.wrap(boundsVec);
   },
 
-  update: function (thisBoidsIndex, boidList, didEat) {
-    var boidsCollidingWithThisBoid = [];
-    var neighborCount = 0;
-    this.nearestNeighbor = null;
-    this.nearestNeighborDist = Infinity;
-    var neighborContributedAcceleration = new Vector(0,0);
-
-    for (var i = 0; i < boidList.length; i++) {
-      var otherBoid = boidList[i];
-      var distanceFromOtherBoid = this.position.distanceFrom(otherBoid.position);
-      if (distanceFromOtherBoid < neighborDistance && this != otherBoid) {
-        // apply genomic flocking forces
-        var accelerationFromThisNeighbor = this.calculateAccelerationFromNeighbor(otherBoid);
-        neighborContributedAcceleration.x += accelerationFromThisNeighbor.x;
-        neighborContributedAcceleration.y += accelerationFromThisNeighbor.y;
-
-        if (distanceFromOtherBoid < collisionDistance) {
-          boidsCollidingWithThisBoid.push(i);
-        } else if (distanceFromOtherBoid < this.nearestNeighborDist) {
-          this.nearestNeighbor = otherBoid;
-          this.nearestNeighborDist = distanceFromOtherBoid;
-        }
-
-        neighborCount++;
-      } else {
-        otherBoid.position.unwrap(this.boundsVec, neighborDistance);
-        distanceFromOtherBoid = this.position.distanceFrom(otherBoid.position);
-        if (distanceFromOtherBoid < neighborDistance && this != otherBoid) {
-          // apply genomic flocking forces
-          var accelerationFromThisNeighbor = this.calculateAccelerationFromNeighbor(otherBoid);
-          neighborContributedAcceleration.x += accelerationFromThisNeighbor.x;
-          neighborContributedAcceleration.y += accelerationFromThisNeighbor.y;
-
-          if (distanceFromOtherBoid < collisionDistance) {
-            boidsCollidingWithThisBoid.push(i);
-          } else if (distanceFromOtherBoid < this.nearestNeighborDist) {
-            this.nearestNeighbor = otherBoid;
-            this.nearestNeighborDist = distanceFromOtherBoid;
-          }
-
-         neighborCount++;
-        }
-        otherBoid.position.wrap(this.boundsVec);
-      }
-    }
-
-    // apply loneliness death possibility
-    // if (Math.random() < lonelyDeathProbability && neighborCount == 0) { boidsCollidingWithThisBoid.push(thisBoidsIndex); }
-
-    // apply new (incentivizes big groups) loneliness death possibility
-    //if (Math.random()+Math.random()*neighborCount < lonelyDeathProbability) {
-    //  boidsCollidingWithThisBoid.push(thisBoidsIndex);
-    //}
-
-    // try to eat, die if ye fail.
-    if (!didEat) {
-      boidsCollidingWithThisBoid.push(thisBoidsIndex);
-    }
-
-    if (neighborCount > 0) {
-      this.acceleration.x += neighborContributedAcceleration.x / neighborCount;
-      this.acceleration.y += neighborContributedAcceleration.y / neighborCount;
-    }
-
-    // apply genomic acceleration and velocity based changes
-    this.calculateAccelerationFromSelf();
-
-    // do physics
-    this.iterateKinematics();
-
-    // get older
-    this.age++;
-
-    // return indices to be deleted if this boid and another boid have collided.
-    if (boidsCollidingWithThisBoid.length > 0) {
-      boidsCollidingWithThisBoid.push(thisBoidsIndex);
-    }
-    return {
-             collidingBoids: boidsCollidingWithThisBoid,
-             neighborCount: neighborCount
-           };
-  }
 };
 
 var Vector = function (x, y) {
