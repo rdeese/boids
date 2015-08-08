@@ -1,7 +1,17 @@
+<!DOCTYPE html>
 <!-- Copyright Rupert Deese 2015 -->
 <!-- Licensed under GNU GPL http://www.gnu.org/licenses/gpl.txt --> 
-
+<html>
+<head>
 <script type='css' src='rupe-blog.css'></script>
+<!-- Tangle -->
+<script type="text/javascript" src="Tangle.js"></script>
+<!-- TangleKit (optional) -->
+<link rel="stylesheet" href="TangleKit/TangleKit.css" type="text/css">
+<script type="text/javascript" src="TangleKit/mootools.js"></script>
+<script type="text/javascript" src="TangleKit/sprintf.js"></script>
+<script type="text/javascript" src="TangleKit/BVTouchable.js"></script>
+<script type="text/javascript" src="TangleKit/TangleKit.js"></script>
 
 <style>
 h5 {
@@ -67,6 +77,8 @@ h5 {
 }
 
 </style>
+</head>
+<body>
         <section>
           <figure id=boidWithRangeDiv>
             <canvas id=boidWithRange width=301 height=91>
@@ -79,11 +91,30 @@ h5 {
 <span class="caption text-muted">The boid genome.</span>
           </figure>
           <figure>
-            <img src="boideqn.png"/>
+<img src="boideqn.png"/>
 <span class="caption text-muted">The boids' governing equation.</span>
           </figure>
         </section>
-        <h5>The Boid-World</h5>
+        <p id="controls">
+          <b>Flock</b></br>
+          Boid size: <span data-var="boidSize" class="TKAdjustableNumber" data-min="1" data-max="10"> pixels</span><br>
+          Minimum speed: <span data-var="minSpeed" class="TKAdjustableNumber" data-min="0" data-max="9"> pixels per frame</span><br>
+          Maximum speed: <span data-var="maxSpeed" class="TKAdjustableNumber" data-min="1" data-max="10"> pixels per frame</span><br>
+          Maximum acceleration: <span data-var="maxAcceleration" class="TKAdjustableNumber" data-min="0.1" data-max="3" data-step="0.1" data-format="%.1f"> pixels per frame^2</span><br>
+          Vision range: <span data-var="neighborDistance" class="TKAdjustableNumber" data-min="10" data-max="100" data-step="1"> pixels</span><br>
+          Population size: <span data-var="populationSize" class="TKAdjustableNumber" data-min="10" data-max="200" data-step="10"> boids</span><br>
+          Mutation rate: <span data-var="mutationFactor" class="TKAdjustableNumber" data-min="0" data-max="2" data-step="0.05" data-format="%.2f"></span><br>
+          Probability of death if alone: <span data-var="lonelyDeathProbability" class="TKAdjustableNumber" data-min="0" data-max="1" data-step="0.05" data-format="percent"></span><br>
+          <b>Food</b></br>
+          Food size: <span data-var="foodSize" class="TKAdjustableNumber" data-min="1" data-max="10" data-step="1"> pixels</span><br>
+          Maximum food capacity: <span data-var="maxFoodBuildup" class="TKAdjustableNumber" data-min="1" data-max="100" data-step="1"> boid meals per food square</span><br>
+          Food regeneration rate: 1 boid meal per <span data-var="foodBuildupRate" class="TKAdjustableNumber" data-min="1" data-max="100" data-step="1"> frames</span><br>
+        </p>
+        <button id=startstopbutton>Start/Stop</button>
+        <button id=resetbutton>Reset</button>
+        <button id=savebutton>Save</button>
+        <button id=loadbutton>Load</button>
+
         <div id="boidsim" width=750 height=950>
           <div id="boidland" width=750 height=550>
             <canvas id="boidfood" style="z-index: 1; position:absolute; left:0px; top:0px;" width="750" height="550"></canvas>
@@ -120,3 +151,5 @@ h5 {
         </div>
         <script type='text/javascript' src='chart.js'></script>
         <script type='text/javascript' src='boids-food.js'></script>
+</body>
+</html>
