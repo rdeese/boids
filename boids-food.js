@@ -194,6 +194,54 @@ World.prototype = {
         this.flock.genomeAverages[j] /= this.flock.boidList.length;
       }
 
+      // update the histogram
+      var zip = function (boids) {
+        return boids[0].genome.map(function(_,i){
+          return boids.map(function(boid){return boid.genome[i];});
+        });
+      };
+
+      var genes = zip(this.flock.boidList);
+      var range = genes
+        .map(function (x) {
+          return d3.extent(x);
+        })
+        .reduce(function (x,y) {
+          return [d3.min([x[0],y[0]]),d3.max([x[1],y[1]])];
+        });
+      var histLayout = d3.layout.histogram().range(range).bins(10).frequency(false);
+
+      var histData = genes.map(function (data, i) {
+        return {
+          key: 'g_'+(i+1),
+          values: histLayout(data)
+        };
+      });
+
+      nv.addGraph(function() {
+        var hist = nv.models.multiBarChart();
+
+        hist.xAxis
+          .tickFormat(d3.format(',.1f'));
+
+        hist.yAxis
+          .tickFormat(d3.format(',%'));
+
+        hist.color(nv.utils.getColor(["rgba(128,0,0,0.5)",
+                                      "rgba(255,0,0,0.5)",
+                                      "rgba(0,128,0,0.5)",
+                                      "rgba(0,0,255,0.5)",
+                                      "rgba(0,255,255,0.5)"]));
+
+        hist.animate = false;
+
+        d3.select('#histogram svg')
+          .datum(histData)
+          .call(hist);
+
+        return hist;
+    });
+
       // Add them to the chart
       charts.genomeChart.addData([
         this.flock.genomeAverages[0],
@@ -303,6 +351,12 @@ Flock.prototype = {
     var secondParent = firstParent.nearestNeighbor ||
                        this.boidList[Math.round(Math.random()*(this.boidList.length-1))];
 
+    while (firstParent.position.distanceFrom(secondParent.position) < 2*this.collisionDistance) {
+      firstParent = this.boidList[Math.round(Math.random()*(this.boidList.length-1))];
+      secondParent = firstParent.nearestNeighbor ||
+                         this.boidList[Math.round(Math.random()*(this.boidList.length-1))];
+    }
+
     // create the new genome
     var newGenome = [0,0,0,0,0,0];
     var crossoverPoint = Math.round(Math.random()*(newGenome.length-1));
@@ -339,6 +393,7 @@ Flock.prototype = {
 
     // gather info about the boids
     this.genomeAverages = [0,0,0,0,0,0];
+    this.genomesLists = [[],[],[],[],[],[]];
     this.fitnessTotal = 0;
 
     // the possible reproducing boids
