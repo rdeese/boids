@@ -3,21 +3,28 @@
 <!-- Licensed under GNU GPL http://www.gnu.org/licenses/gpl.txt --> 
 <html>
 <head>
-<script type='css' src='rupe-blog.css'></script>
-<script type='css' src='nv.d3.min.css'></script>
+<script type='css' src='css/rupe-blog.css'></script>
+<script type='css' src='css/nv.d3.min.css'></script>
 <!-- Tangle -->
-<script type="text/javascript" src="Tangle.js"></script>
+<script type="text/javascript" src="js/Tangle.js"></script>
 <!-- TangleKit (optional) -->
-<link rel="stylesheet" href="TangleKit/TangleKit.css" type="text/css">
-<script type="text/javascript" src="TangleKit/mootools.js"></script>
-<script type="text/javascript" src="TangleKit/sprintf.js"></script>
-<script type="text/javascript" src="TangleKit/BVTouchable.js"></script>
-<script type="text/javascript" src="TangleKit/TangleKit.js"></script>
+<link rel="stylesheet" href="js/TangleKit/TangleKit.css" type="text/css">
+<script type="text/javascript" src="js/TangleKit/mootools.js"></script>
+<script type="text/javascript" src="js/TangleKit/sprintf.js"></script>
+<script type="text/javascript" src="js/TangleKit/BVTouchable.js"></script>
+<script type="text/javascript" src="js/TangleKit/TangleKit.js"></script>
 
 <!-- D3.js -->
-<script type="text/javascript" src="d3.min.js"></script>
+<script type="text/javascript" src="js/d3.min.js"></script>
 <!-- NV.D3.js -->   
-<script type="text/javascript" src="nv.d3.js"></script>
+<script type="text/javascript" src="js/nv.d3.js"></script>
+
+<!-- Boids classes -->
+<script type="text/javascript" src="js/boids-util.js"></script>
+<script type="text/javascript" src="js/boids-food.js"></script>
+<script type="text/javascript" src="js/boids-boid.js"></script>
+<script type="text/javascript" src="js/boids-flock.js"></script>
+
 
 <style>
 h5 {
@@ -47,7 +54,7 @@ h5 {
 #boidcharts {
   position:relative;
   width:750px;
-  height:400px;
+  height:200px;
   margin-top:20px;
   margin-bottom:20px;
 }
@@ -128,6 +135,7 @@ h5 {
         <button id=resetbutton>Reset</button>
         <button id=savebutton>Save</button>
         <button id=loadbutton>Load</button>
+        <button id=savefoodimg>Save canvas</button>
 
         <div id="boidsim" width=750 height=950>
           <div id="boidland" width=750 height=550>
@@ -136,35 +144,11 @@ h5 {
                 This text is displayed if your browser does not support HTML5 Canvas.
             </canvas>
           </div>
-          <div id="boidcharts">
-            <div id="genomeChartDiv">
-              <h5>Current Genome</h5>
-              <canvas id="genomeChart" width="365" height="180">
-                  No canvas support :(
-              </canvas>
-            </div>
-            <div id="fitnessChartDiv">
-              <h5>Current Fitness</h5>
-              <canvas id="fitnessChart" width="365" height="180">
-                  No canvas support :(
-              </canvas>
-            </div>
-            <div id="allGenomesChartDiv">
-              <h5>All Genomes</h5>
-              <canvas id="allGenomesChart" width="365" height="180">
-                  No canvas support :(
-              </canvas>
-            </div>
-            <div id="allFitnessesChartDiv">
-              <h5>All Fitnesses</h5>
-              <canvas id="allFitnessesChart" width="365" height="180">
-                  No canvas support :(
-              </canvas>
-            </div>
+          <div id="charts">
+            <div id="geneHistogram"><svg style="height:200px; width:750px"></svg></div>
+            <div id="fitnessHistogram"><svg style="height:200px; width:750px"></svg></div>
           </div>
-          <div id="histogram"><svg style="height:400px; width:750px"></svg></div>
         </div>
-        <script type='text/javascript' src='chart.js'></script>
-        <script type='text/javascript' src='boids-food.js'></script>
+        <script type='text/javascript' src='js/main.js'></script>
 </body>
 </html>

@@ -1864,9 +1864,9 @@ nv.models.axis = function() {
                     and the arithmetic trick below solves that.
                     */
                     return !parseFloat(Math.round(d * 100000) / 1000000) && (d !== undefined)
-                }) 
+                })
                 .classed('zero', true);
-            
+
             //store old scales for use in transitions on update
             scale0 = scale.copy();
 
@@ -2271,7 +2271,7 @@ nv.models.boxPlotChart = function() {
         .orient((rightAlignYAxis) ? 'right' : 'left')
         .tickFormat(d3.format(',.1f'))
     ;
-    
+
     tooltip.duration(0);
 
     //============================================================
@@ -2302,7 +2302,7 @@ nv.models.boxPlotChart = function() {
             chart.container = this;
 
             // Display No Data message if there's nothing to show. (quartiles required at minimum)
-            if (!data || !data.length || 
+            if (!data || !data.length ||
                     !data.filter(function(d) { return d.values.hasOwnProperty("Q1") && d.values.hasOwnProperty("Q2") && d.values.hasOwnProperty("Q3"); }).length) {
                 var noDataText = container.selectAll('.nv-noData').data([noData]);
 
@@ -7239,7 +7239,7 @@ nv.models.lineWithFocusChart = function() {
 
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-            
+
             //Set up interactive layer
             if (useInteractiveGuideline) {
                 interactiveLayer
@@ -7382,7 +7382,7 @@ nv.models.lineWithFocusChart = function() {
                             var currentValues = series.values.filter(function(d,i) {
                             return lines.x()(d,i) >= extent[0] && lines.x()(d,i) <= extent[1];
                         });
- 
+
                         pointIndex = nv.interactiveBisect(currentValues, e.pointXValue, lines.x());
                         var point = currentValues[pointIndex];
                         var pointYValue = chart.y()(point, pointIndex);
@@ -7710,10 +7710,10 @@ nv.models.multiBar = function() {
                 parsed.forEach(function(series, i){
                     // if series is non-stackable, use un-parsed data
                     if (series.nonStackable) {
-                        data[i].nonStackableSeries = nonStackableCount++; 
+                        data[i].nonStackableSeries = nonStackableCount++;
                         parsed[i] = data[i];
                     } else {
-                        // don't stack this seires on top of the nonStackable seriees 
+                        // don't stack this seires on top of the nonStackable seriees
                         if (i > 0 && parsed[i - 1].nonStackable){
                             parsed[i].values.map(function(d,j){
                                 d.y0 -= parsed[i - 1].values[j].y;
@@ -7749,7 +7749,7 @@ nv.models.multiBar = function() {
                                 posBase = posBase + f.size;
                             }
                         }
-                        
+
                     });
                 });
             }
@@ -7949,7 +7949,7 @@ nv.models.multiBar = function() {
                         if (data[j].nonStackable) {
                             width = d.series * x.rangeBand() / data.length;
                             if (data.length !== nonStackableCount){
-                                width = data[j].nonStackableSeries * x.rangeBand()/(nonStackableCount*2); 
+                                width = data[j].nonStackableSeries * x.rangeBand()/(nonStackableCount*2);
                             }
                         }
                         return width;
@@ -7960,7 +7960,7 @@ nv.models.multiBar = function() {
                         } else {
                             // if all series are nonStacable, take the full width
                             var width = (x.rangeBand() / nonStackableCount);
-                            // otherwise, nonStackable graph will be only taking the half-width 
+                            // otherwise, nonStackable graph will be only taking the half-width
                             // of the x rangeBand
                             if (data.length !== nonStackableCount) {
                                 width = x.rangeBand()/(nonStackableCount*2);
@@ -8119,6 +8119,7 @@ nv.models.multiBarChart = function() {
     controls.updateState(false);
 
     //============================================================
+    //                console.log("chart is", chart);
     // Private Variables
     //------------------------------------------------------------
 
@@ -8336,6 +8337,7 @@ nv.models.multiBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
+                console.log("After state change, state is:"
                 chart.update();
             });
 
@@ -12260,13 +12262,13 @@ nv.models.stackedArea = function() {
             gEnter.append('g').attr('class', 'nv-scatterWrap');
 
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-            
+
             // If the user has not specified forceY, make sure 0 is included in the domain
             // Otherwise, use user-specified values for forceY
             if (scatter.forceY().length == 0) {
                 scatter.forceY().push(0);
             }
-            
+
             scatter
                 .width(availableWidth)
                 .height(availableHeight)
