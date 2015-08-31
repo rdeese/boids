@@ -8337,7 +8337,6 @@ nv.models.multiBarChart = function() {
                 for (var key in newState)
                     state[key] = newState[key];
                 dispatch.stateChange(state);
-                console.log("After state change, state is:"
                 chart.update();
             });
 
